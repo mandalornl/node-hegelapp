@@ -11,7 +11,7 @@
 			<% resources.css.forEach(function(resource){ %>
 				<link rel="stylesheet" href="<%= (locals.resourceRoot || '') + resource %>">
 			<% }); %>
-		<% } %>		
+		<% } %>
 		<script>
 			var app = window.app || {};
 			<% if (locals.jsVars) { %>
@@ -23,7 +23,7 @@
 				<script src="<%= (locals.resourceRoot || '') + resource %>"></script>
 			<% }); %>
 		<% } %>
-		<% if (locals.env === 'dev' && locals.liveReloadPort) { %>
+		<% if (locals.env === 'development' && locals.liveReloadPort !== null) { %>
 			<script src="//localhost:<%= liveReloadPort %>/livereload.js"></script>
 		<% } %>
 	</head>

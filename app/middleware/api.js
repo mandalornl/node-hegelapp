@@ -1,6 +1,4 @@
 var router = require('express').Router();
-var sprintf = require('locutus/php/strings/sprintf');
-
 var client = require('../telnet/client');
 
 module.exports = function(app)
@@ -34,7 +32,7 @@ module.exports = function(app)
 				throw 'Value has to be of type Number, ' + (typeof value) + ' given';
 			}
 
-			return sprintf(app.cmd[type][method], value);
+			return app.cmd[type][method].replace('<int>', Number(value));
 		}
 
 		return app.cmd[type][method];

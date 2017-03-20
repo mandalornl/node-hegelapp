@@ -1,6 +1,6 @@
 var fs = require('fs');
 var url = require('url');
-var childProcess = require('child_process');
+var exec = require('child_process').exec;
 
 var express = require('express');
 var compression = require('compression');
@@ -42,7 +42,7 @@ var init = function(gitHash)
 	app.locals.env = app.config.env;
 	app.locals.resourceRoot = gitHash + '/';
 
-	if (app.config.env === 'dev')
+	if (app.config.env === 'development')
 	{
 		app.locals.liveReloadPort = app.config.liveReloadPort;
 		app.locals.resources = require('./app/resources');
@@ -105,13 +105,13 @@ if (process.env.GIT_HASH)
 }
 else
 {
-	if (app.config.env === 'dev')
+	if (app.config.env === 'development')
 	{
 		init('xQN04i26sn');
 	}
 	else
 	{
-		childProcess.exec('git rev-parse --short HEAD', function(err, stdout)
+		exec('git rev-parse --short HEAD', function(err, stdout)
 		{
 			if (err)
 			{

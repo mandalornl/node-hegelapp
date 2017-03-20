@@ -20,17 +20,22 @@ module.exports = {
 
 ## Installation
 
-Use the following command to install the necessary packages.
+Use the following command to install the necessary `npm` packages.
 ```bash
 $ npm install
 ```
 
-To start the `express` server, just run:
+To start the `express` server, install `bower` packages, minify `css` and uglify `js`,  just run:
 ```bash
-$ grunt prod
+$ grunt production
 ```
 
-## Usage 
+Or just simply run:
+```bash
+$ node app
+```
+
+## Usage
 
 Depending on the `configuration` settings the proxy can be accessed using:
 

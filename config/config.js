@@ -1,6 +1,6 @@
 var fs = require('fs');
 var _ = require('lodash');
-var env = process.env.NODE_ENV || 'dev';
+var env = process.env.NODE_ENV || 'development';
 
 var config = {
 	global: {
@@ -16,7 +16,7 @@ var config = {
 		}
 	},
 
-	dev: {
+	development: {
 		port: 3000,
 
 		liveReloadPort: 43921,
@@ -25,7 +25,7 @@ var config = {
 		ejsCache: false
 	},
 
-	live: {
+	production: {
 		viewCache: true,
 		ejsCache: true
 	}

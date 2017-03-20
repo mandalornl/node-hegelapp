@@ -4,7 +4,8 @@
   "description": "Webapp to control your Hegel Röst via IP-control",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "init": "grunt production"
   },
   "keywords": [
     "Hegel",
@@ -27,7 +28,6 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-express-server": "^0.5.3",
     "grunt-sass": "^2.0.0",
-    "locutus": "^2.0.8",
     "lodash": "^4.17.4",
     "node-sass": "^4.5.0",
     "serve-favicon": "^2.4.1"

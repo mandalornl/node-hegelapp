@@ -178,6 +178,12 @@
 
 		$btnVolumeDown.on('click', function()
 		{
+			console.log($volume.text(), !($volume.text() > 0 && $volume.text() <= 100));
+			if (!($volume.text() > 0 && $volume.text() <= 100))
+			{
+				return;
+			}
+
 			syncStatuses.stop();
 
 			app.api.get('volume/down', function(err, volume)
@@ -197,6 +203,11 @@
 
 		$btnVolumeUp.on('click', function()
 		{
+			if (!($volume.text() >= 0 && $volume.text() < 100))
+			{
+				return;
+			}
+
 			syncStatuses.stop();
 
 			app.api.get('volume/up', function(err, volume)

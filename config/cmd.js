@@ -16,17 +16,17 @@ module.exports = {
 	volume: {
 		up: '-v.u',
 		down: '-v.d',
-		set: '-v.%d',
+		set: '-v.<int>',
 		status: '-v.?'
 	},
 
 	input: {
-		set: '-i.%d',
+		set: '-i.<int>',
 		status: '-i.?'
 	},
 
 	reset: {
-		set: '-r.%d',
+		set: '-r.<int>',
 		stop: '-r.~',
 		status: '-r.?'
 	}

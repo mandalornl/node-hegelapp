@@ -45,22 +45,24 @@ module.exports = function(config, callback)
 		});
 
 		// send data response to clients
-		connection.on('data', function(data)
+		connection.on('data', function(buffer)
 		{
+			// normalize data
+			var data = buffer.toString().replace(/\r\n|\r|\n/, '');
+
 			var client = queue.shift();
 			if (!client)
 			{
-				// rc8 was used, update all connected clients
+				// remote was used, update all connected clients
 				clients.forEach(function(client)
 				{
-					console.log('[Proxy] - Data send to %s', client.name);
-					client.write(data.toString().replace(/\r\n|\r|\n/, ''));
+					console.log('[Proxy] - Data \'%s\' send to %s', data, client.name);
+					client.write(data);
 				});
 				return;
 			}
 
-			console.log('[Proxy] - Data send to %s', client.name);
-			client.write(data.toString().replace(/\r\n|\r|\n/, ''));
+			client.write(data);
 		});
 
 		net.createServer(function(socket)
@@ -105,4 +107,3 @@ module.exports = function(config, callback)
 		});
 	});
 };
-

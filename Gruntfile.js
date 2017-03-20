@@ -5,7 +5,7 @@ module.exports = function(grunt)
 {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		
+
 		sass: {
 			options: {
 				sourceMap: true,
@@ -15,8 +15,8 @@ module.exports = function(grunt)
 					__dirname + '/node_modules/bootstrap-sass/assets/stylesheets'
 				]
 			},
-			
-			dev: {
+
+			development: {
 				files: [{
 					expand: true,
 					cwd: 'sass',
@@ -27,7 +27,7 @@ module.exports = function(grunt)
 				}]
 			},
 
-			prod: {
+			production: {
 				files: [{
 					expand: true,
 					cwd: 'sass',
@@ -42,7 +42,7 @@ module.exports = function(grunt)
 				}
 			}
 		},
-		
+
 		icomoon: {
 			options: {
 				files: [
@@ -51,21 +51,21 @@ module.exports = function(grunt)
 				dest: __dirname + '/sass/_icomoon.scss'
 			}
 		},
-		
+
 		watch: {
 			sass: {
 				files: ['sass/**/*.scss'],
-				tasks: ['sass:dev'],
+				tasks: ['sass:development'],
 				options: {
 					spawn: true
 				}
 			},
-			
+
 			icomoon: {
 				files: ['public/assets/icomoon/style.css'],
 				tasks: ['icomoon']
 			},
-			
+
 			css: {
 				files: ['public/css/**/*.css'],
 				tasks: [],
@@ -73,20 +73,20 @@ module.exports = function(grunt)
 					livereload: config.liveReloadPort
 				}
 			},
-			
+
 			express: {
 				files: [
 					'app.js',
 					'app/**/*.js',
 					'config.js'
 				],
-				tasks: ['express:dev'],
+				tasks: ['express:development'],
 				options: {
 					spawn: false,
 					livereload: config.liveReloadPort
 				}
 			},
-			
+
 			views: {
 				files: ['app/view/**/*.ejs'],
 				options: {
@@ -94,21 +94,21 @@ module.exports = function(grunt)
 				}
 			}
 		},
-		
+
 		express: {
 			options: {
 				script: 'app.js'
 			},
 
-			dev: {},
+			development: {},
 
-			prod: {
+			production: {
 				options: {
-					NODE_ENV: 'prod'
+					node_env: 'production'
 				}
 			}
 		},
-		
+
 		bower: {
 			install: {
 				options: {
@@ -118,9 +118,9 @@ module.exports = function(grunt)
 				}
 			}
 		},
-		
+
 		uglify: {
-			dist: {
+			production: {
 				files: {
 					'public/combined/combined.js': resources.js.map(function(resource)
 					{
@@ -129,15 +129,15 @@ module.exports = function(grunt)
 				}
 			}
 		},
-		
+
 		cssmin: {
 			options: {
 				rebase: true,
 				keepSpecialComments: false,
 				relativeTo: 'public/combined'
 			},
-			
-			dist: {
+
+			production: {
 				files: {
 					'public/combined/combined.css': resources.css.map(function(resource)
 					{
@@ -147,7 +147,7 @@ module.exports = function(grunt)
 			}
 		}
 	});
-	
+
 	grunt.file.expand({
 		filter: 'isFile'
 	}, [
@@ -157,14 +157,14 @@ module.exports = function(grunt)
 		grunt.log.writeln('>> loading & registering: ' + path);
 		require(path)(grunt);
 	});
-	
+
 	grunt.loadNpmTasks('grunt-sass');
 	grunt.loadNpmTasks('grunt-bower-task');
 	grunt.loadNpmTasks('grunt-express-server');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
-	
-	grunt.registerTask('default', ['bower', 'icomoon', 'sass:dev', 'express:dev', 'watch']);
-	grunt.registerTask('prod', ['bower', 'sass:prod', 'uglify', 'cssmin', 'express:prod']);
+
+	grunt.registerTask('default', ['bower', 'icomoon', 'sass:development', 'express:development', 'watch']);
+	grunt.registerTask('production', ['bower', 'sass:production', 'uglify', 'cssmin', 'express:production']);
 };
