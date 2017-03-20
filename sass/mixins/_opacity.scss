@@ -1,0 +1,14 @@
+@mixin opacity($opacity, $important: false)
+{
+	$opacity-ie: $opacity * 100;
+	@if $important == true
+	{
+		opacity: $opacity !important;
+		filter: alpha(opacity=$opacity-ie) !important;
+	}
+	@else
+	{
+		opacity: $opacity;
+		filter: alpha(opacity=$opacity-ie);
+	}
+}

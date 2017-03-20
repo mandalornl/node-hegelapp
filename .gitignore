@@ -1,0 +1,8 @@
+/.idea
+/.sass-cache
+/node_modules
+/public/assets/bower
+/public/css/*
+/public/combined
+/config/localcfg.js
+!**/.gitkeep

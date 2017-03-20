@@ -1,0 +1,23 @@
+@mixin icomoon($fontCode)
+{
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	content: '#{$fontCode}';
+}
+
+@mixin smicon($fontCode)
+{
+	@include icomoon($fontCode);
+
+	font-family: 'smicon';
+}

@@ -1,0 +1,15 @@
+[class^='transition-fade-'],
+[class*=' transition-fade-']
+{
+	@include transition(opacity .5s ease-in-out)
+}
+
+.transition-fade-in
+{
+	@include opacity(1, true);
+}
+
+.transition-fade-out
+{
+	@include opacity(0, true);
+}

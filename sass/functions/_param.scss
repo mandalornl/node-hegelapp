@@ -1,0 +1,20 @@
+@function get-param($param, $params: (), $default: false)
+{
+	@if not map-has-key($params, $param)
+	{
+		@if ($default != false)
+		{
+			@return $default;
+		}
+
+		@error 'Unknown `#{$param}` in `#{$params}`';
+	}
+
+	$value: map-get($params, $param);
+	@if type-of($value) == 'string' and map-has-key($params, $value)
+	{
+		@return map-get($params, $value);
+	}
+
+	@return $value;
+}

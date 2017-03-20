@@ -1,0 +1,40 @@
+{
+  "name": "node-hegelapp",
+  "description": "Webapp to control your Hegel Röst via IP-control",
+  "main": "app.js",
+  "keywords": [
+    "Hegel",
+    "Röst",
+    "IP-control"
+  ],
+  "authors": [
+    "Joost Berns"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "toastr": "^2.1.3"
+  },
+  "ignoredDependencies": [
+    "jquery"
+  ],
+  "exportsOverride": {
+    "jquery": {
+      "": "dist/jquery.min.*"
+    },
+    "toastr": {
+      "": "toastr.min.*"
+    }
+  },
+  "resolutions": {
+    "jquery": "^3.1.1"
+  }
+}

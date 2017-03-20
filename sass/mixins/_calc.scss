@@ -1,0 +1,11 @@
+@mixin calc($property, $expression, $fallback: false)
+{
+	@if $fallback != false
+	{
+		#{$property}: $fallback;
+	}
+
+	#{$property}: -webkit-calc(#{$expression});
+	#{$property}: -moz-calc(#{$expression});
+	#{$property}: calc(#{$expression});
+}

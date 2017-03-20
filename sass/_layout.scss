@@ -1,0 +1,26 @@
+.btn.active
+{
+	@include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border);
+}
+
+.logo
+{
+	text-align: center;
+
+	margin-top: 10px;
+
+	img
+	{
+		display: inline-block;
+	}
+}
+
+#volume
+{
+	font-size: 72px;
+	font-weight: 700;
+
+	line-height: normal;
+
+	text-align: right;
+}

@@ -1,0 +1,149 @@
+/* http://css3.wikidot.com/blog:animated-page-entry-with-css3 */
+
+@mixin loading($params: ())
+{
+	$params: map-merge((
+		border-size: 4px,
+		color: #000,
+		size: 40px,
+		z-index: 10000,
+		speed: .75s,
+		enable-overlay: true,
+		overlay-color: #000,
+		overlay-opacity: .1,
+		overlay-position: absolute,
+		enable-delay: true,
+		fade-delay: 1s,
+		fade-speed: .2s,
+		fade-easing: ease-out
+	), $params);
+
+	position: relative;
+
+	$zIndex: get-param(z-index, $params);
+	$fadeDelay: get-param(fade-delay, $params);
+	$fadeSpeed: get-param(fade-speed, $params);
+	$fadeEasing: get-param(fade-easing, $params);
+	$enableDelay: get-param(enable-delay, $params);
+
+	@if (get-param(enable-overlay, $params))
+	{
+		&:before
+		{
+			content: '';
+
+			position: get-param(overlay-position, $params);
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+
+			z-index: $zIndex;
+
+			background: rgba(get-param(overlay-color, $params), get-param(overlay-opacity, $params));
+
+			@if $enableDelay
+			{
+				animation-name: mixin-loading-reset-opacity, mixin-loading-fade-opacity;
+				animation-duration: $fadeDelay, $fadeSpeed;
+				animation-timing-function: linear, $fadeEasing;
+				animation-iteration-count: 1;
+				animation-delay: 0s, $fadeDelay;
+			}
+		}
+	}
+
+	&:after
+	{
+		content: '';
+
+		$border-size: get-param(border-size, $params);
+		$color: get-param(color, $params);
+		border: $border-size solid rgba($color, .15);
+		border-top-color: rgba($color, .8);
+
+		@include border-radius(100%);
+
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		z-index: $zIndex + 1;
+
+		$size: get-param(size, $params);
+		width: $size;
+		height: $size;
+
+		margin: -($size / 2);
+
+		$speed: get-param(speed, $params);
+		@include transition(all $speed ease 0s);
+		@include transform-origin(center);
+
+		@if $enableDelay
+		{
+			animation-name: mixin-loading-rotate-loader, mixin-loading-reset-opacity, mixin-loading-fade-opacity;
+			animation-duration: $speed, $fadeDelay, $fadeSpeed;
+			animation-timing-function: linear, linear, $fadeEasing;
+			animation-iteration-count: infinite, 1, 1;
+			animation-delay: 0s, 0s, $fadeDelay;
+		}
+		@else
+		{
+			@include animation(mixin-loading-rotate-loader $speed infinite linear);
+		}
+	}
+
+	&.immediately
+	{
+		&:before
+		{
+			animation: none !important;
+		}
+
+		&:after
+		{
+			animation: mixin-loading-rotate-loader .75s linear infinite !important;
+		}
+	}
+}
+
+@keyframes mixin-loading-rotate-loader
+{
+	from {
+		@include transform(rotate(0deg));
+	}
+
+	to {
+		@include transform(rotate(359deg));
+	}
+}
+
+@keyframes mixin-loading-reset-opacity
+{
+	from {
+		@include opacity(0);
+
+		visibility: hidden;
+	}
+
+	to {
+		@include opacity(0);
+
+		visibility: hidden;
+	}
+}
+
+@keyframes mixin-loading-fade-opacity
+{
+	from {
+		@include opacity(0);
+
+		visibility: hidden;
+	}
+
+	to {
+		@include opacity(1);
+
+		visibility: visible;
+	}
+}

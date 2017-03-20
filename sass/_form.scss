@@ -1,0 +1,120 @@
+select
+{
+	&.select2,
+	&.autocomplete
+	{
+		@include opacity(0);
+	}
+
+	&[data-width]
+	{
+		width: auto !important;
+	}
+
+	&[id$='day'],
+	&[id$='hour'],
+	&[id$='minute']
+	{
+		width: 80px !important;
+
+		padding-right: 12px !important;
+	}
+
+	&[id$='month'],
+	&[id$='year']
+	{
+		width: 90px !important;
+
+		padding-right: 12px !important;
+	}
+}
+
+label.required:after
+{
+	content: ' *';
+}
+
+[type=checkbox], [type=radio]
+{
+	& + label
+	{
+		font-weight: normal;
+
+		display: inline-block;
+
+		margin-bottom: 0;
+
+		@include user-select(none);
+	}
+
+	&:disabled + label,
+	&:disabled + label:before
+	{
+		cursor: not-allowed;
+	}
+
+	&:disabled + label:before
+	{
+		background: #eee;
+	}
+
+	&:focus + label:before
+	{
+		border: 1px solid $input-border-focus;
+
+		@include smi-form-control-focus();
+	}
+}
+
+form
+{
+	@include clearfix();
+}
+
+.form-date
+{
+	select:not(.select2),
+	.select2
+	{
+		display: inline-block;
+
+		&:not(:last-child)
+		{
+			margin-right: 6px;
+		}
+	}
+}
+
+.form-checkbox, .form-radio
+{
+	margin-top: 8px;
+
+	&:first-child
+	{
+		margin-top: 6px;
+	}
+
+	&.inline
+	{
+		display: inline-block;
+
+		margin: 6px 6px 0 0;
+	}
+}
+
+.has-error
+{
+	[type=checkbox],
+	[type=radio]
+	{
+		& + label
+		{
+			color: $state-danger-text;
+		}
+
+		&:focus + label:before
+		{
+			@include smi-form-control-focus($state-danger-text);
+		}
+	}
+}
