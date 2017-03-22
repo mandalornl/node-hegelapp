@@ -1,8 +1,20 @@
 var net = require('net');
 var cmd = require('./config/cmd');
 
+/**
+ * @type {net.Socket[]}
+ */
 var clients = [];
 
+/**
+ * @type {{
+ * 	power: {on, off, toggle, status},
+ * 	volume: {up, down, set, status},
+ * 	mute: {on, off, toggle, status},
+ * 	input: {set, status},
+ * 	reset: {set, stop, status}
+ * }}
+ */
 var device = {
 	power: (function()
 	{
@@ -146,6 +158,10 @@ net.createServer(function(socket)
 		switch (data)
 		{
 			case cmd.power.on:
+				device.volume.set(20);
+				device.input.set(4);
+				device.mute.off();
+				device.reset.set('~');
 				return socket.write('-p.' + device.power.on() + '\r');
 			case cmd.power.off:
 				return socket.write('-p.' + device.power.off() + '\r');
@@ -164,8 +180,10 @@ net.createServer(function(socket)
 				return socket.write('-m.' + device.mute.status() + '\r');
 
 			case cmd.volume.up:
+				device.mute.off();
 				return socket.write('-v.' + device.volume.up() + '\r');
 			case cmd.volume.down:
+				device.mute.off();
 				return socket.write('-v.' + device.volume.down() + '\r');
 			case cmd.volume.status:
 				return socket.write('-v.' + device.volume.status() + '\r');
@@ -182,6 +200,7 @@ net.createServer(function(socket)
 		switch (true)
 		{
 			case /^-v.\d+$/.test(data):
+				device.mute.off();
 				var volume = data.replace(/[^\d]+/, '');
 				return socket.write('-v.' + device.volume.set(volume) + '\r');
 

@@ -1,5 +1,5 @@
 var router = require('express').Router();
-var client = require('../telnet/client');
+var client = require('../proxy/client');
 
 module.exports = function(app)
 {

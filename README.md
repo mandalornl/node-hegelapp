@@ -12,9 +12,9 @@ Create `localcfg.js` and place in the `/config` folder.
 **Example**
 ```javascript
 module.exports = {
-	device: {
-		host: '192.168.x.x'
-	}
+  device: {
+    host: '192.168.x.x'
+  }
 };
 ```
 

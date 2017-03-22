@@ -8,7 +8,7 @@ var favicon = require('serve-favicon');
 var ejs = require('ejs');
 
 var api = require('./app/middleware/api');
-var proxy = require('./app/telnet/server');
+var proxy = require('./app/proxy/server');
 
 var app = express();
 app.config = require('./config/config');

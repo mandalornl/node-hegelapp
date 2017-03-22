@@ -178,7 +178,6 @@
 
 		$btnVolumeDown.on('click', function()
 		{
-			console.log($volume.text(), !($volume.text() > 0 && $volume.text() <= 100));
 			if (!($volume.text() > 0 && $volume.text() <= 100))
 			{
 				return;

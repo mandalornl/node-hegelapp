@@ -23,7 +23,7 @@
 				<script src="<%= (locals.resourceRoot || '') + resource %>"></script>
 			<% }); %>
 		<% } %>
-		<% if (locals.env === 'development' && locals.liveReloadPort !== null) { %>
+		<% if (locals.env === 'development' && locals.liveReloadPort > 0) { %>
 			<script src="//localhost:<%= liveReloadPort %>/livereload.js"></script>
 		<% } %>
 	</head>
