@@ -32,7 +32,7 @@ module.exports = function(grunt)
 		{
 			if (!grunt.file.exists(path))
 			{
-				grunt.log.warn('File \'' + path + '\' not found.');
+				grunt.log.warn('File \'' + path + '\' not found. Skipping...');
 				return false;
 			}
 
@@ -53,7 +53,19 @@ module.exports = function(grunt)
 			});
 		});
 
+		if (!output)
+		{
+			grunt.log.writeln('No icons found. Done!');
+			return;
+		}
+
+		// create dir
+		if (!grunt.file.exists(options.dest))
+		{
+			grunt.file.mkdir(options.dest.replace(/\/[^\/]+\.scss$/, ''));
+		}
+
 		grunt.file.write(options.dest, output);
-		grunt.log.writeln('File \'' + options.dest + '\' created.');
+		grunt.log.writeln('File \'' + options.dest + '\' created. Done!');
 	});
 };

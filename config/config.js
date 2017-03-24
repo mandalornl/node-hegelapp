@@ -10,6 +10,10 @@ var config = {
 
 		liveReloadPort: null,
 
+		jsVars: {
+			updateInterval: 5000
+		},
+
 		device: {
 			host: '0.0.0.0',
 			port: 50001

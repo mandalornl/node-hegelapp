@@ -67,11 +67,13 @@ var init = function(gitHash)
 
 	app.get('/', function(req, res)
 	{
+		res.locals.jsVars = app.config.jsVars || {};
 		res.locals.basedir = url.format({
 			protocol: req.protocol,
 			host: req.get('host'),
 			pathname: '/'
 		});
+
 		res.render('index');
 	});
 

@@ -4,7 +4,7 @@
   "description": "Webapp to control your Hegel Röst via IP-control",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "grunt build",
     "init": "grunt production"
   },
   "keywords": [

@@ -97,7 +97,8 @@ module.exports = function(grunt)
 
 		express: {
 			options: {
-				script: 'app.js'
+				script: 'app.js',
+				output: '^App listening on: \d+$'
 			},
 
 			development: {},
@@ -166,5 +167,7 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 
 	grunt.registerTask('default', ['bower', 'icomoon', 'sass:development', 'express:development', 'watch']);
-	grunt.registerTask('production', ['bower', 'sass:production', 'uglify', 'cssmin', 'express:production']);
+	grunt.registerTask('build', ['bower', 'icomoon', 'sass:production', 'uglify', 'cssmin']);
+	grunt.registerTask('development', ['express:development']);
+	grunt.registerTask('production', ['express:production']);
 };

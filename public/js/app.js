@@ -58,7 +58,7 @@
 					}).addClass('active');
 
 					window.clearTimeout(timer);
-					timer = window.setTimeout(update, 500);
+					timer = window.setTimeout(update, app.global.updateInterval || 1000);
 				});
 			};
 

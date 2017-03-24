@@ -1,7 +1,7 @@
 module.exports = {
 	css: [
-		'assets/bower/toastr/toastr.min.css',
 		'assets/icomoon/style.css',
+		'assets/bower/toastr/toastr.min.css',
 		'css/main.css'
 	],
 	js: [
