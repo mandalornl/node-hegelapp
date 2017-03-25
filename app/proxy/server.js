@@ -98,7 +98,7 @@ module.exports = function(config, callback)
 			});
 		}).listen({
 			host: config.host,
-			port: config.port + 1
+			port: Number(config.port) + 1
 		}, function()
 		{
 			console.log('Proxy listening on: %d', this.address().port);

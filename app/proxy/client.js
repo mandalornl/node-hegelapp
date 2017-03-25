@@ -64,7 +64,7 @@ module.exports = function(app)
 
 			var client = net.connect({
 				host: app.config.host,
-				port: app.config.port + 1
+				port: Number(app.config.port) + 1
 			}, function()
 			{
 				console.log('[Client] - Connected to: %s:%s', this.remoteAddress, this.remotePort);
