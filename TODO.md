@@ -1,2 +1,1 @@
 - Use file logger, ex: Winston.
-- Icons aren't loaded in production environment

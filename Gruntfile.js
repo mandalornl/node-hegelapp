@@ -134,7 +134,7 @@ module.exports = function(grunt)
 		cssmin: {
 			options: {
 				rebase: true,
-				keepSpecialComments: false,
+				keepSpecialComments: 0,
 				relativeTo: 'public/combined'
 			},
 
