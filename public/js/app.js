@@ -16,6 +16,21 @@
 		var $btnVolumeUp = $('#btnVolumeUp');
 
 		var $btnInputs = $('[id^="btnInput_"]');
+		var $btnPresets = $('[id^="btnPreset_"]');
+
+		/**
+		 * Disable buttons.
+		 * @param {boolean} state
+		 */
+		var disableButtons = function(state)
+		{
+			$btnVolumeMute.prop('disabled', state);
+			$btnVolumeDown.prop('disabled', state);
+			$btnVolumeUp.prop('disabled', state);
+
+			$btnInputs.prop('disabled', state);
+			$btnPresets.prop('disabled', state);
+		};
 
 		/**
 		 * Sync statuses.
@@ -29,9 +44,9 @@
 			var timer = null;
 
 			/**
-			 * Update statuses.
+			 * Sync callback.
 			 */
-			var update = function()
+			var sync = function()
 			{
 				$body.addClass('loading');
 
@@ -45,20 +60,34 @@
 						return console.log(err);
 					}
 
-					$btnPowerOn.toggleClass('active', !!statuses.p);
-					$btnPowerOff.toggleClass('active', !statuses.p);
-
-					$btnVolumeMute.toggleClass('active', !!statuses.m);
-
-					$volume.text(statuses.v);
-
-					$btnInputs.removeClass('active').filter(function()
+					if (statuses.hasOwnProperty('p'))
 					{
-						return $(this).data('id') === statuses.i;
-					}).addClass('active');
+						$btnPowerOn.toggleClass('active', !!statuses.p);
+						$btnPowerOff.toggleClass('active', !statuses.p);
+
+						disableButtons(!statuses.p);
+					}
+
+					if (statuses.hasOwnProperty('m'))
+					{
+						$btnVolumeMute.toggleClass('active', !!statuses.m);
+					}
+
+					if (statuses.hasOwnProperty('v'))
+					{
+						$volume.text(statuses.v);
+					}
+
+					if (statuses.hasOwnProperty('i'))
+					{
+						$btnInputs.removeClass('active').filter(function()
+						{
+							return $(this).data('id') === statuses.i;
+						}).addClass('active');
+					}
 
 					window.clearTimeout(timer);
-					timer = window.setTimeout(update, app.global.updateInterval || 1000);
+					timer = window.setTimeout(sync, app.global.updateInterval || 1000);
 				});
 			};
 
@@ -71,7 +100,7 @@
 				{
 					if (timer === null)
 					{
-						update();
+						sync();
 						return true;
 					}
 
@@ -79,20 +108,27 @@
 				},
 
 				/**
-				 * Stop sync.
-				 * @returns {boolean}
+				 * Pause sync.
+				 * @returns {syncStatuses}
 				 */
-				stop: function()
+				pause: function()
 				{
-					if (timer !== null)
-					{
-						window.clearTimeout(timer);
-						timer = null;
+					window.clearTimeout(timer);
+					timer = null;
 
-						return true;
-					}
+					return this;
+				},
 
-					return false;
+				/**
+				 * Resume sync.
+				 * @returns {syncStatuses}
+				 */
+				resume: function()
+				{
+					window.clearTimeout(timer);
+					timer = window.setTimeout(sync, app.global.updateInterval || 1000);
+
+					return this;
 				},
 
 				/**
@@ -116,11 +152,11 @@
 				return;
 			}
 
-			syncStatuses.stop();
+			syncStatuses.pause();
 
 			app.api.get('power/on', function(err, status)
 			{
-				syncStatuses.start();
+				syncStatuses.resume();
 
 				if (err)
 				{
@@ -130,6 +166,8 @@
 
 				$this.toggleClass('active', status);
 				$btnPowerOff.toggleClass('active', !status);
+
+				disableButtons(false);
 			});
 		});
 
@@ -141,11 +179,11 @@
 				return;
 			}
 
-			syncStatuses.stop();
+			syncStatuses.pause();
 
 			app.api.get('power/off', function(err, status)
 			{
-				syncStatuses.start();
+				syncStatuses.resume();
 
 				if (err)
 				{
@@ -153,18 +191,20 @@
 					return console.log(err);
 				}
 
-				$btnPowerOn.toggleClass('active', !status);
-				$this.toggleClass('active', status);
+				$btnPowerOn.toggleClass('active', status);
+				$this.toggleClass('active', !status);
+
+				disableButtons(true);
 			});
 		});
 
 		$btnVolumeMute.on('click', function()
 		{
-			syncStatuses.stop();
+			syncStatuses.pause();
 
 			app.api.get('mute/toggle', function(err, status)
 			{
-				syncStatuses.start();
+				syncStatuses.resume();
 
 				if (err)
 				{
@@ -183,11 +223,11 @@
 				return;
 			}
 
-			syncStatuses.stop();
+			syncStatuses.pause();
 
 			app.api.get('volume/down', function(err, volume)
 			{
-				syncStatuses.start();
+				syncStatuses.resume();
 
 				if (err)
 				{
@@ -207,11 +247,11 @@
 				return;
 			}
 
-			syncStatuses.stop();
+			syncStatuses.pause();
 
 			app.api.get('volume/up', function(err, volume)
 			{
-				syncStatuses.start();
+				syncStatuses.resume();
 
 				if (err)
 				{
@@ -232,11 +272,11 @@
 				return;
 			}
 
-			syncStatuses.stop();
+			syncStatuses.pause();
 
 			app.api.get('input/set/' + $this.data('id'), function(err, input)
 			{
-				syncStatuses.start();
+				syncStatuses.resume();
 
 				if (err)
 				{
@@ -246,6 +286,46 @@
 
 				$btnInputs.removeClass('active');
 				$this.addClass('active');
+			});
+		});
+
+		$btnPresets.on('click', function()
+		{
+			syncStatuses.pause();
+
+			app.api.get('preset/' + $(this).data('id'), function(err, statuses)
+			{
+				syncStatuses.resume();
+
+				if (err)
+				{
+					app.toastr('Connection error', 'error');
+					return console.log(err);
+				}
+
+				if (statuses.hasOwnProperty('v'))
+				{
+					$volume.text(statuses.v);
+				}
+
+				if (statuses.hasOwnProperty('i'))
+				{
+					$btnInputs.removeClass('active').filter(function()
+					{
+						return $(this).data('id') === statuses.i;
+					}).addClass('active');
+				}
+
+				if (statuses.hasOwnProperty('m'))
+				{
+					$btnVolumeMute.toggleClass('active', !!statuses.m);
+				}
+
+				if (statuses.hasOwnProperty('p'))
+				{
+					$btnPowerOn.toggleClass('active', !!statuses.p);
+					$btnPowerOff.toggleClass('active', !statuses.p);
+				}
 			});
 		});
 	});

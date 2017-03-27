@@ -11,7 +11,7 @@ var config = {
 		liveReloadPort: null,
 
 		jsVars: {
-			updateInterval: 5000
+			updateInterval: 1000
 		},
 
 		device: {
@@ -38,7 +38,7 @@ var config = {
 var localCfg = {};
 try
 {
-	var filename = __dirname + '/localcfg.js';
+	var filename = __dirname + '/local/config.js';
 	fs.accessSync(filename);
 	localCfg = require(filename);
 }

@@ -13,6 +13,7 @@ var proxy = require('./app/proxy/server');
 var app = express();
 app.config = require('./config/config');
 app.cmd = require('./config/cmd');
+app.presets = require('./config/presets');
 
 app.use(compression({}));
 app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -73,6 +74,7 @@ var init = function(gitHash)
 			host: req.get('host'),
 			pathname: '/'
 		});
+		res.locals.presets = app.presets;
 
 		res.render('index');
 	});

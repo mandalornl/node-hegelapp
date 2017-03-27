@@ -15,11 +15,35 @@ var clients = [];
  * 	reset: {set, stop, status}
  * }}
  */
-var device = {
-	power: (function()
-	{
-		var power = 1;
-		return {
+var device = (function()
+{
+	/**
+	 * @type {number}
+	 */
+	var power = 1;
+
+	/**
+	 * @type {number}
+	 */
+	var volume = 20;
+
+	/**
+	 * @type {number}
+	 */
+	var mute = 0;
+
+	/**
+	 * @type {number}
+	 */
+	var input = 4;
+
+	/**
+	 * @type {number|string}
+	 */
+	var reset = 2;
+
+	return {
+		power: {
 			on: function()
 			{
 				return power = 1;
@@ -32,19 +56,15 @@ var device = {
 
 			toggle: function()
 			{
-				return (power = power === 1 ? 0 : 1);
+				return (power = Number(power) === 1 ? 0 : 1);
 			},
 
 			status: function()
 			{
 				return power;
 			}
-		};
-	})(),
-	volume: (function()
-	{
-		var volume = 20;
-		return  {
+		},
+		volume: {
 			up: function()
 			{
 				return (volume = Math.min(volume + 1, 100));
@@ -57,6 +77,7 @@ var device = {
 
 			set: function(value)
 			{
+				value = Number(value);
 				if (value >= 0 && value <= 100)
 				{
 					return (volume = value);
@@ -69,12 +90,8 @@ var device = {
 			{
 				return volume;
 			}
-		};
-	})(),
-	mute: (function()
-	{
-		var mute = 0;
-		return {
+		},
+		mute: {
 			on: function()
 			{
 				return mute = 1;
@@ -87,21 +104,18 @@ var device = {
 
 			toggle: function()
 			{
-				return (mute = mute === 1 ? 0 : 1);
+				return (mute = Number(mute) === 1 ? 0 : 1);
 			},
 
 			status: function()
 			{
 				return mute;
 			}
-		};
-	})(),
-	input: (function()
-	{
-		var input = 4;
-		return {
+		},
+		input: {
 			set: function(value)
 			{
+				value = Number(value);
 				if (value >= 1 && value <= 9)
 				{
 					return (input = value);
@@ -114,15 +128,11 @@ var device = {
 			{
 				return input;
 			}
-		};
-	})(),
-
-	reset: (function()
-	{
-		var reset = 2;
-		return {
+		},
+		reset: {
 			set: function(value)
 			{
+				value = Number(value);
 				if (value >= 1 && value <= 255)
 				{
 					return (reset = value);
@@ -140,9 +150,9 @@ var device = {
 			{
 				return reset;
 			}
-		};
-	})()
-};
+		}
+	};
+})();
 
 net.createServer(function(socket)
 {
@@ -158,12 +168,12 @@ net.createServer(function(socket)
 		switch (data)
 		{
 			case cmd.power.on:
+				return socket.write('-p.' + device.power.on() + '\r');
+			case cmd.power.off:
 				device.volume.set(20);
 				device.input.set(4);
 				device.mute.off();
-				device.reset.set('~');
-				return socket.write('-p.' + device.power.on() + '\r');
-			case cmd.power.off:
+				device.reset.set(2);
 				return socket.write('-p.' + device.power.off() + '\r');
 			case cmd.power.toggle:
 				return socket.write('-p.' + device.power.toggle() + '\r');

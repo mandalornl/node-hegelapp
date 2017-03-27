@@ -38,32 +38,6 @@ module.exports = function(app)
 		return app.cmd[type][method];
 	};
 
-	router.get('/:type/:method/:value?', function(req, res)
-	{
-		try
-		{
-			var cmd = getCommand(
-				req.params.type,
-				req.params.method,
-				req.params.value
-			);
-		}
-		catch (err)
-		{
-			return res.json({
-				err: err.toString()
-			});
-		}
-
-		connection.call(cmd, function(err, data)
-		{
-			res.json({
-				err: err,
-				data: data || null
-			});
-		});
-	});
-
 	router.get('/statuses', function(req, res)
 	{
 		connection.call([
@@ -79,6 +53,50 @@ module.exports = function(app)
 				data: statuses || null
 			});
 		});
+	});
+
+	router.get('/preset/:index', function(req, res)
+	{
+		try
+		{
+			connection.call(app.presets[req.params.index].cmds, function(err, statuses)
+			{
+				res.json({
+					err: err,
+					data: statuses || null
+				});
+			});
+		}
+		catch (err)
+		{
+			res.json({
+				err: 'Preset not found'
+			});
+		}
+	});
+
+	router.get('/:type/:method/:value?', function(req, res)
+	{
+		try
+		{
+			connection.call(getCommand(
+				req.params.type,
+				req.params.method,
+				req.params.value
+			), function(err, data)
+			{
+				res.json({
+					err: err,
+					data: data
+				});
+			});
+		}
+		catch (err)
+		{
+			res.json({
+				err: 'Command not found'
+			});
+		}
 	});
 
 	router.get('/', function(req, res)

@@ -7,7 +7,7 @@ It uses a proxy server to connect to the Hegel Röst which allows for multiple c
 ## Configuration
 
 Be sure to configure the ip address to use your Hegel device in the config file.
-Create `localcfg.js` and place in the `/config` folder.
+Create `config.js` and place it in the `/config/local` folder.
 
 **Example**
 ```javascript
@@ -16,6 +16,22 @@ module.exports = {
     host: '192.168.x.x'
   }
 };
+```
+
+## Presets
+
+Presets can be defined to use your preferred settings i.e. for listening to music or watching movies. 
+Just create a `presets.json` file and place it in the `/config/local` folder.
+
+**Example**
+```json
+[{
+	"name": "Music",
+	"cmds": {
+		"input": 4,
+		"volume": 30
+	}
+}]
 ```
 
 ## Installation

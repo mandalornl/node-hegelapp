@@ -4,5 +4,5 @@
 /public/assets/bower
 /public/css/*
 /public/combined
-/config/localcfg.js
+/config/local/
 !**/.gitkeep
