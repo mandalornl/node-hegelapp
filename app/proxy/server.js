@@ -17,29 +17,32 @@ module.exports = function(config, callback)
 		// a timeout occurred, notify clients and disconnect
 		connection.on('timeout', function()
 		{
+			console.log('[Proxy] - Connection timeout');
+
 			clients.forEach(function(client)
 			{
-				client.write('[Proxy] - Connection timeout');
-				client.end();
+				client.emit('timeout');
 			});
 		});
 
 		// an error occurred, notify clients and disconnect
 		connection.on('error', function(err)
 		{
+			console.error('[Proxy] - ' + err.toString());
+
 			clients.forEach(function(client)
 			{
-				client.write(err);
-				client.end();
+				client.emit('error', err);
 			});
 		});
 
 		// connection ended, notify clients and disconnect
 		connection.on('end', function()
 		{
+			console.log('[Proxy] - Connection ended');
+
 			clients.forEach(function(client)
 			{
-				client.write('[Proxy] - Connection ended');
 				client.end();
 			});
 		});
@@ -84,7 +87,7 @@ module.exports = function(config, callback)
 
 			socket.on('error', function(err)
 			{
-				console.log(err);
+				console.error(err);
 
 				socket.end();
 			});

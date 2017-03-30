@@ -54,6 +54,7 @@ module.exports = function(app)
 			var q = 0;
 			var queue = [data];
 
+			var error = null;
 			var result = '';
 
 			if (Array.isArray(data))
@@ -69,14 +70,14 @@ module.exports = function(app)
 			{
 				console.log('[Client] - Connected to: %s:%s', this.remoteAddress, this.remotePort);
 
-				console.log('[Client] - Data request: %s', queue[q]);
+				console.log('[Client] - [%d/%d] - Data request: %s', q + 1, queue.length, queue[q]);
 				client.write(queue[q]);
 			});
 
 			client.on('data', function(buffer)
 			{
 				var data = buffer.toString();
-				console.log('[Client] - Data response: %s', data);
+				console.log('[Client] - [%d/%d] - Data response: %s', q + 1, queue.length, data);
 
 				var value = getValue(data);
 
@@ -88,7 +89,7 @@ module.exports = function(app)
 					q++;
 					if (queue[q])
 					{
-						console.log('[Client] - Data request: %s', queue[q]);
+						console.log('[Client] - [%d/%d] - Data request: %s', q + 1, queue.length, queue[q]);
 						client.write(queue[q]);
 						return;
 					}
@@ -98,22 +99,25 @@ module.exports = function(app)
 					result = value;
 				}
 
-				client.end();
+				console.log('[Client] - All data received');
 
-				callback(null, result);
+				client.end();
+			});
+
+			client.on('error', function(err)
+			{
+				console.error(err);
+
+				error = err;
+
+				client.end();
 			});
 
 			client.on('end', function()
 			{
 				console.log('[Client] - Connection ended');
-			});
 
-			client.on('error', function(err)
-			{
-				console.log(err);
-				client.end();
-
-				callback(err);
+				callback(error, result);
 			});
 		}
 	};

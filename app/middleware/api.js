@@ -1,9 +1,9 @@
 var router = require('express').Router();
-var client = require('../proxy/client');
+var Client = require('../proxy/client');
 
 module.exports = function(app)
 {
-	var connection = client(app);
+	var client = Client(app);
 
 	/**
 	 * Get command. Throw error when no proper command was found.
@@ -40,7 +40,7 @@ module.exports = function(app)
 
 	router.get('/statuses', function(req, res)
 	{
-		connection.call([
+		client.call([
 			app.cmd.power.status,
 			app.cmd.mute.status,
 			app.cmd.volume.status,
@@ -50,7 +50,7 @@ module.exports = function(app)
 		{
 			res.json({
 				err: err,
-				data: statuses || null
+				data: statuses || {}
 			});
 		});
 	});
@@ -59,11 +59,11 @@ module.exports = function(app)
 	{
 		try
 		{
-			connection.call(app.presets[req.params.index].cmds, function(err, statuses)
+			client.call(app.presets[req.params.index].cmds, function(err, statuses)
 			{
 				res.json({
 					err: err,
-					data: statuses || null
+					data: statuses || {}
 				});
 			});
 		}
@@ -79,7 +79,7 @@ module.exports = function(app)
 	{
 		try
 		{
-			connection.call(getCommand(
+			client.call(getCommand(
 				req.params.type,
 				req.params.method,
 				req.params.value

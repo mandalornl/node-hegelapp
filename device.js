@@ -228,7 +228,7 @@ net.createServer(function(socket)
 
 	socket.on('error', function(err)
 	{
-		console.log(err);
+		console.error(err);
 
 		socket.end();
 	});
@@ -240,6 +240,12 @@ net.createServer(function(socket)
 
 		clients.splice(clients.indexOf(socket), 1);
 	});
+
+	// only 1 client can connect at a time, this mimics the behavior of the Röst
+	if (clients.length > 1)
+	{
+		socket.emit('error', new Error('ECONNREFUSED'));
+	}
 }).listen({
 	host: '0.0.0.0',
 	port: 50001
