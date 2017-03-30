@@ -26,11 +26,11 @@ Just create a `presets.json` file and place it in the `/config/local` folder.
 **Example**
 ```json
 [{
-	"name": "Music",
-	"cmds": {
-		"input": 4,
-		"volume": 30
-	}
+  "name": "Music",
+  "cmds": {
+    "input": 4,
+    "volume": 30
+  }
 }]
 ```
 
