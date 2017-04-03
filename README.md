@@ -70,3 +70,7 @@ $ node device
 ```
 
 Be sure to run it before the `express` server starts and make sure you change the ip address in the `config` file accordingly.
+
+## Disclaimer
+
+This app is in no way affiliated with, authorized, maintained, sponsored or endorsed by Hegel or any of its affiliates or subsidiaries.
