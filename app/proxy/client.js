@@ -74,6 +74,8 @@ module.exports = function(app)
 				client.write(queue[q]);
 			});
 
+			client.setTimeout(1500);
+
 			client.on('data', function(buffer)
 			{
 				var data = buffer.toString();
@@ -106,9 +108,16 @@ module.exports = function(app)
 
 			client.on('error', function(err)
 			{
-				console.error(err);
+				console.error('[Client] - %s', err.toString());
 
 				error = err;
+
+				client.end();
+			});
+
+			client.on('timeout', function()
+			{
+				console.log('[Client] - Connection timeout');
 
 				client.end();
 			});
