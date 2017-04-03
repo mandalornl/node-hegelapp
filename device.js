@@ -251,5 +251,5 @@ net.createServer(function(socket)
 	port: 50001
 }, function()
 {
-	console.log('Device listening on: %s', this.address().port);
+	console.log('[Device] - Listening on: %s', this.address().port);
 });

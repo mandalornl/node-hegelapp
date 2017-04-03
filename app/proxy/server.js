@@ -2,162 +2,179 @@ var net = require('net');
 
 module.exports = function(config, callback)
 {
-	var clients = [];
+	var initial = true;
 
-	// request queue
-	var queue = [];
-
-	// connection options
-	var options = {
-		host: config.device.host,
-		port: config.device.port
-	};
-
-	var connection = new net.Socket();
+	var timeoutId;
+	var timeoutDelay = 10000;
 
 	/**
-	 * Call when a connection to the device is established.
-	 * @param {boolean} [isReconnect = false]
-	 * @returns {Function}
+	 * Establish connection to device and create proxy server.
 	 */
-	var onConnect = function(isReconnect)
+	var connect = function()
 	{
-		isReconnect = isReconnect || false;
+		timeoutId = null;
 
-		return function()
+		// socket list
+		var sockets = [];
+
+		// socket queue
+		var queue = [];
+
+		// create proxy server
+		var server = net.createServer(function(socket)
 		{
-			// skip proxy server creation on reconnect
-			if (isReconnect)
-			{
-				console.log('[Device] - Reconnected to %s:%s', this.remoteAddress, this.remotePort);
-				return;
-			}
+			socket.name = socket.remoteAddress + ':' + socket.remotePort;
+			console.log('[Proxy] - %s connected', socket.name);
 
+			// add client to clients list
+			sockets.push(socket);
+
+			// send data to device connection
+			socket.on('data', function(data)
+			{
+				connection.write(data + '\r', function()
+				{
+					queue.push(socket);
+				});
+			});
+
+			socket.on('error', function(err)
+			{
+				console.error('[Proxy] - %s', err.toString());
+
+				socket.end();
+			});
+
+			// remove client from list when it leaves
+			socket.on('end', function()
+			{
+				console.log('[Proxy] - %s disconnected', socket.name);
+
+				sockets.splice(sockets.indexOf(socket), 1);
+			});
+		});
+
+		// create device connection
+		var connection = net.createConnection({
+			host: config.device.host,
+			port: config.device.port
+		}, function()
+		{
 			console.log('[Device] - Connected to %s:%s', this.remoteAddress, this.remotePort);
 
-			net.createServer(function(socket)
-			{
-				socket.name = socket.remoteAddress + ':' + socket.remotePort;
-				console.log('[Proxy] - %s connected', socket.name);
-
-				// add client to clients list
-				clients.push(socket);
-
-				// send data to device connection
-				socket.on('data', function(data)
-				{
-					connection.write(data + '\r', function()
-					{
-						queue.push(socket);
-					});
-				});
-
-				socket.on('error', function(err)
-				{
-					console.error('[Proxy] - %s', err.toString());
-
-					socket.end();
-				});
-
-				// remove client from list when it leaves
-				socket.on('end', function()
-				{
-					console.log('[Proxy] - %s disconnected', socket.name);
-
-					clients.splice(clients.indexOf(socket), 1);
-				});
-			}).listen({
+			server.listen({
 				host: config.host,
 				port: Number(config.port) + 1
 			}, function()
 			{
-				console.log('Proxy listening on: %d', this.address().port);
+				console.log('[Proxy] - Listening on: %d', this.address().port);
 
-				callback(null);
+				if (initial)
+				{
+					initial = false;
+
+					callback(null);
+				}
 			});
-		};
+		});
+
+		connection.on('error', function(err)
+		{
+			console.error('[Device] - %s', err.toString());
+
+			// notify and disconnect socket(s)
+			sockets.forEach(function(socket)
+			{
+				socket.write('-e.500', function()
+				{
+					socket.end();
+				});
+			});
+
+			// skip, already trying to reconnect
+			if (timeoutId !== null)
+			{
+				return;
+			}
+
+			// gracefully close proxy server
+			server.close(function()
+			{
+				console.log('[Device] - Trying to reconnect in %d seconds...', timeoutDelay / 1000);
+
+				// try to reconnect
+				timeoutId = setTimeout(connect, timeoutDelay);
+			});
+		});
+
+		// a timeout occurred
+		connection.on('timeout', function()
+		{
+			console.log('[Device] - Connection timeout');
+
+			// notify and disconnect socket(s)
+			sockets.forEach(function(socket)
+			{
+				socket.write('-e.504', function()
+				{
+					socket.end();
+				});
+			});
+		});
+
+		// connection ended
+		connection.on('end', function()
+		{
+			console.log('[Device] - Connection ended');
+
+			// notify and disconnect socket(s)
+			sockets.forEach(function(socket)
+			{
+				socket.write('-e.503', function()
+				{
+					socket.end();
+				});
+			});
+
+			// skip, already trying to reconnect
+			if (timeoutId !== null)
+			{
+				return;
+			}
+
+			// gracefully close proxy server
+			server.close(function()
+			{
+				console.log('[Device] - Trying to reconnect in %d seconds...', timeoutDelay / 1000);
+
+				// try to reconnect
+				timeoutId = setTimeout(connect, timeoutDelay);
+			});
+		});
+
+		// send data response to socket(s)
+		connection.on('data', function(buffer)
+		{
+			// normalize data
+			var data = buffer.toString().replace(/\r\n|\r|\n/, '');
+
+			var socket = queue.shift();
+			if (!socket)
+			{
+				// device was used, update all connected sockets
+				sockets.forEach(function(socket)
+				{
+					socket.write(data, function()
+					{
+						console.log('[Proxy] - Data \'%s\' send to %s', data, socket.name);
+					});
+				});
+				return;
+			}
+
+			socket.write(data);
+		});
 	};
 
-	// an error occurred
-	connection.on('error', function(err)
-	{
-		console.error('[Device] - %s', err.toString());
-
-		// notify and disconnect client(s)
-		clients.forEach(function(client)
-		{
-			client.write('-e.500', function()
-			{
-				client.end();
-			});
-		});
-
-		// try to reconnect to the device on connection failure
-		if ([
-			'ECONNREFUSED',
-			'EHOSTUNREACH',
-			'ECONNRESET'
-		 ].indexOf(err.code) !== -1)
-		{
-			console.log('Trying to reconnect to device in 10 seconds...');
-
-			setTimeout(function()
-			{
-				connection.connect(options, onConnect(true));
-			}, 10000);
-		}
-	});
-
-	// a timeout occurred
-	connection.on('timeout', function()
-	{
-		console.log('[Device] - Connection timeout');
-
-		// notify and disconnect client(s)
-		clients.forEach(function(client)
-		{
-			client.write('-e.504', function()
-			{
-				client.end();
-			});
-		});
-	});
-
-	// connection ended
-	connection.on('end', function()
-	{
-		console.log('[Device] - Connection ended');
-
-		// notify and disconnect client(s)
-		clients.forEach(function(client)
-		{
-			client.write('-e.503', function()
-			{
-				client.end();
-			});
-		});
-	});
-
-	// send data response to client(s)
-	connection.on('data', function(buffer)
-	{
-		// normalize data
-		var data = buffer.toString().replace(/\r\n|\r|\n/, '');
-
-		var client = queue.shift();
-		if (!client)
-		{
-			// remote was used, update all connected clients
-			clients.forEach(function(client)
-			{
-				console.log('[Proxy] - Data \'%s\' send to %s', data, client.name);
-				client.write(data);
-			});
-			return;
-		}
-
-		client.write(data);
-	});
-
-	connection.connect(options, onConnect());
+	connect();
 };

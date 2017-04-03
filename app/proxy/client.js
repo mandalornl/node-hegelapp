@@ -54,7 +54,6 @@ module.exports = function(app)
 			var q = 0;
 			var queue = [data];
 
-			var error = null;
 			var result = '';
 
 			if (Array.isArray(data))
@@ -74,7 +73,7 @@ module.exports = function(app)
 				client.write(queue[q]);
 			});
 
-			client.setTimeout(1500);
+			client.setTimeout(3000);
 
 			client.on('data', function(buffer)
 			{
@@ -104,15 +103,17 @@ module.exports = function(app)
 				console.log('[Client] - All data received');
 
 				client.end();
+
+				callback(null, result);
 			});
 
 			client.on('error', function(err)
 			{
 				console.error('[Client] - %s', err.toString());
 
-				error = err;
-
 				client.end();
+
+				callback(err.code, '-e.400');
 			});
 
 			client.on('timeout', function()
@@ -120,13 +121,13 @@ module.exports = function(app)
 				console.log('[Client] - Connection timeout');
 
 				client.end();
+
+				callback('ETIMEDOUT', '-e.408');
 			});
 
 			client.on('end', function()
 			{
 				console.log('[Client] - Connection ended');
-
-				callback(error, result);
 			});
 		}
 	};

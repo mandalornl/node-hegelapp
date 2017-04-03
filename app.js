@@ -98,7 +98,7 @@ var init = function(gitHash)
 			port: app.config.port
 		}, function()
 		{
-			console.log('App listening on: %d', this.address().port);
+			console.log('[App] - Listening on: %d', this.address().port);
 		});
 	});
 };

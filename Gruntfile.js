@@ -98,7 +98,7 @@ module.exports = function(grunt)
 		express: {
 			options: {
 				script: 'app.js',
-				output: '^App listening on: \d+$'
+				output: '^\[App\] - Listening on: \d+$'
 			},
 
 			development: {},
