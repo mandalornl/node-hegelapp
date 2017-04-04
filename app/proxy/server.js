@@ -32,7 +32,7 @@ module.exports = function(config, callback)
 			// send data to device connection
 			socket.on('data', function(data)
 			{
-				connection.write(data + '\r', function()
+				client.write(data + '\r', function()
 				{
 					queue.push(socket);
 				});
@@ -55,7 +55,7 @@ module.exports = function(config, callback)
 		});
 
 		// create device connection
-		var connection = net.createConnection({
+		var client = net.connect({
 			host: config.device.host,
 			port: config.device.port
 		}, function()
@@ -78,7 +78,7 @@ module.exports = function(config, callback)
 			});
 		});
 
-		connection.on('error', function(err)
+		client.on('error', function(err)
 		{
 			console.error('[Device] - %s', err.toString());
 
@@ -108,7 +108,7 @@ module.exports = function(config, callback)
 		});
 
 		// a timeout occurred
-		connection.on('timeout', function()
+		client.on('timeout', function()
 		{
 			console.log('[Device] - Connection timeout');
 
@@ -123,7 +123,7 @@ module.exports = function(config, callback)
 		});
 
 		// connection ended
-		connection.on('end', function()
+		client.on('end', function()
 		{
 			console.log('[Device] - Connection ended');
 
@@ -153,7 +153,7 @@ module.exports = function(config, callback)
 		});
 
 		// send data response to socket(s)
-		connection.on('data', function(buffer)
+		client.on('data', function(buffer)
 		{
 			// normalize data
 			var data = buffer.toString().replace(/\r\n|\r|\n/, '');

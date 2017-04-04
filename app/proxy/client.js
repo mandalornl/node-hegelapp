@@ -64,7 +64,8 @@ module.exports = function(app)
 
 			var client = net.connect({
 				host: app.config.host,
-				port: Number(app.config.port) + 1
+				port: Number(app.config.port) + 1,
+				timeout: 3000
 			}, function()
 			{
 				console.log('[Client] - Connected to: %s:%s', this.remoteAddress, this.remotePort);
@@ -72,8 +73,6 @@ module.exports = function(app)
 				console.log('[Client] - [%d/%d] - Data request: %s', q + 1, queue.length, queue[q]);
 				client.write(queue[q]);
 			});
-
-			client.setTimeout(3000);
 
 			client.on('data', function(buffer)
 			{
