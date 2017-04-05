@@ -15,7 +15,7 @@ app.config = require('./config/config');
 app.cmd = require('./config/cmd');
 app.presets = require('./config/presets');
 
-app.use(compression({}));
+app.use(compression());
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
 app.set('views', __dirname + '/app/view');

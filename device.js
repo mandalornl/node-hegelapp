@@ -4,7 +4,7 @@ var cmd = require('./config/cmd');
 /**
  * @type {net.Socket[]}
  */
-var clients = [];
+var sockets = [];
 
 /**
  * @type {{
@@ -154,12 +154,12 @@ var device = (function()
 	};
 })();
 
-net.createServer(function(socket)
+var server = net.createServer(function(socket)
 {
 	socket.name = socket.remoteAddress + ':' + socket.remotePort;
 	console.log('[Device] - %s connected', socket.name);
 
-	clients.push(socket);
+	sockets.push(socket);
 
 	// send data to telnet connection
 	socket.on('data', function(buffer)
@@ -238,15 +238,14 @@ net.createServer(function(socket)
 	{
 		console.log('[Device] - %s disconnected', socket.name);
 
-		clients.splice(clients.indexOf(socket), 1);
+		sockets.splice(sockets.indexOf(socket), 1);
 	});
+});
 
-	// only 1 client can connect at a time, this mimics the behavior of the Röst
-	if (clients.length > 1)
-	{
-		socket.emit('error', new Error('ECONNREFUSED'));
-	}
-}).listen({
+// only 1 socket can connect at a time, this mimics the behavior of the Röst
+server.maxConnections = 1;
+
+server.listen({
 	host: '0.0.0.0',
 	port: 50001
 }, function()
